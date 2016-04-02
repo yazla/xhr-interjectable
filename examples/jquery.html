@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>jQuery Example &mdash; xhr-interjectable</title>
+</head>
+<body>
+
+    <h1>xhr-interjectable</h1>
+    <h2>jQuery Example</h2>
+
+    <script src="https://code.jquery.com/jquery-2.1.3.js"></script>
+    <script src="../dist/XhrInterjectable.js"></script>
+    <script>
+        var xhrInterjectable = require('xhr-interjectable');
+
+        window.XMLHttpRequest = xhrInterjectable({
+            realXhrConstructor : window.XMLHttpRequest,
+            requestToKeyFn : function(url, method, data)
+            {
+                return url;
+            },
+            storage : {
+                save : function(){},
+                load : function(key)
+                {
+                    return {
+                        'http://google.com/' : '<h1>This is be g00gle</h1>'
+                    }[key]
+                }
+            }
+        })
+
+        // ---------
+
+        $.get('http://google.com/', function(data, textStatus, jqXHR) {
+            console.log('loaded', data);
+        }).fail(function() {
+            console.log('ERROR', arguments);
+        });
+
+        $.get('http://www.html5rocks.com/en/', function(data, textStatus, jqXHR) {
+            console.log('html5rocks loaded', data.substring(0,5));
+        }).fail(function() {
+            console.log('ERROR', arguments);
+        });
+
+        // ---------
+
+    </script>
+</body>
+</html>
