@@ -2,7 +2,6 @@
 module.exports = ({
     realXhrConstructor,
     requestToKeyFn,
-    cacheResponses = false,
     storage // {save, load}
 }) => () => {
 
@@ -34,17 +33,16 @@ module.exports = ({
 
     function responseListener (){
         if (myXHR.readyState == 4 && myXHR.status == 200){
-            if (cacheResponses){
-                var key = requestToKeyFn(xhrWrapper.__url, xhrWrapper.method, post_data);
-                storage.save(
-                    key,
-                    {
-                        url : xhrWrapper.__url,
-                        post : xhrWrapper.__post_data,
-                        response : myXHR.response
-                    }
-                );
-            }
+            var key = requestToKeyFn(xhrWrapper.__url, xhrWrapper.method, post_data);
+            storage.save(
+                key,
+                {
+                    url : xhrWrapper.__url,
+                    post : xhrWrapper.__post_data,
+                    response : myXHR.response
+                }
+            );
+
             onSuccessfullResponseRecieved(myXHR.response);
         }
     };

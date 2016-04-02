@@ -4,8 +4,6 @@
 module.exports = function (_ref) {
     var realXhrConstructor = _ref.realXhrConstructor;
     var requestToKeyFn = _ref.requestToKeyFn;
-    var _ref$cacheResponses = _ref.cacheResponses;
-    var cacheResponses = _ref$cacheResponses === undefined ? false : _ref$cacheResponses;
     var storage // {save, load}
     = _ref.storage;
     return function () {
@@ -38,14 +36,13 @@ module.exports = function (_ref) {
 
         function responseListener() {
             if (myXHR.readyState == 4 && myXHR.status == 200) {
-                if (cacheResponses) {
-                    var key = requestToKeyFn(xhrWrapper.__url, xhrWrapper.method, post_data);
-                    storage.save(key, {
-                        url: xhrWrapper.__url,
-                        post: xhrWrapper.__post_data,
-                        response: myXHR.response
-                    });
-                }
+                var key = requestToKeyFn(xhrWrapper.__url, xhrWrapper.method, post_data);
+                storage.save(key, {
+                    url: xhrWrapper.__url,
+                    post: xhrWrapper.__post_data,
+                    response: myXHR.response
+                });
+
                 onSuccessfullResponseRecieved(myXHR.response);
             }
         };
