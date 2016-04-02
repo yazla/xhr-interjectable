@@ -9,5 +9,5 @@ interface XhrInterjectableConfig {
 
 declare module 'xhr-interjectable' {
     let constructor : (config : XhrInterjectableConfig) => XMLHttpRequest;
-    export = constructor;
+    export default constructor;
 }

@@ -3,14 +3,13 @@ module.exports = ({
     realXhrConstructor,
     requestToKeyFn,
     storage // {save, load}
-}) => () => {
+}) => function() {
 
     var myXHR = new realXhrConstructor();
     var xhrWrapper = {
         set onreadystatechange(value){
             xhrWrapper._onreadystatechange = value;
-            xhrWrapper.response &&
-                xhrWrapper._onreadystatechange();
+            value && xhrWrapper.response && xhrWrapper._onreadystatechange();
         },
         get onreadystatechange(){
             return xhrWrapper._onreadystatechange;
@@ -33,7 +32,7 @@ module.exports = ({
 
     function responseListener (){
         if (myXHR.readyState == 4 && myXHR.status == 200){
-            var key = requestToKeyFn(xhrWrapper.__url, xhrWrapper.method, post_data);
+            var key = requestToKeyFn(xhrWrapper.__url, xhrWrapper.method, xhrWrapper.__post_data);
             storage.save(
                 key,
                 {
@@ -74,10 +73,10 @@ module.exports = ({
     };
 
     xhrWrapper.getResponseHeader = function (DOMStringheader){
-        myXHR.getResponseHeader(DOMStringheader);
+        return myXHR.getResponseHeader(DOMStringheader);
     };
     xhrWrapper.getAllResponseHeaders = function (){
-        myXHR.getAllResponseHeaders();
+        return myXHR.getAllResponseHeaders();
     };
 
     xhrWrapper.abort = function(){
