@@ -85,7 +85,13 @@ module.exports = function (_ref) {
             return this.responseHeaders && this.responseHeaders[DOMStringheader];
         };
         xhrWrapper.getAllResponseHeaders = function () {
-            return this.responseHeaders;
+            var headersStr = '';
+            for (var prop in this.responseHeaders) {
+                var val = this.responseHeaders[prop];
+                val = typeof val == 'string' ? '"' + val + '"' : val;
+                headersStr += '"' + prop + ': ' + val + '"\r\n';
+            }
+            return headersStr;
         };
 
         xhrWrapper.abort = function () {
