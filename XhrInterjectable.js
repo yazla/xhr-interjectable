@@ -25,7 +25,8 @@ module.exports = ({
     function onSuccessfullResponseRecieved ({status, response, headers, }) {
         xhrWrapper.readyState = 4;
         xhrWrapper.status = status;
-        xhrWrapper.response = xhrWrapper.responseText = response;
+        xhrWrapper.response = response;
+        xhrWrapper.responseText = JSON.stringify(response);
         xhrWrapper.responseHeaders = headers;
         xhrWrapper._onreadystatechange && xhrWrapper._onreadystatechange();
         xhrWrapper.onload && xhrWrapper.onload.apply(xhrWrapper)
@@ -83,8 +84,7 @@ module.exports = ({
         var headersStr = '';
         for (var prop in this.responseHeaders) {
             var val = this.responseHeaders[prop];
-            val = typeof(val) == 'string' ? `"${val}"`: val;
-            headersStr += `"${prop}: ${val}"\r\n`
+            headersStr += `"${prop}": ${val}"\r\n`
         }
         return headersStr;
     };
