@@ -84,7 +84,7 @@ module.exports = ({
         var headersStr = '';
         for (var prop in this.responseHeaders) {
             var val = this.responseHeaders[prop];
-            headersStr += `"${prop}": ${val}"\r\n`
+            headersStr += `${prop}: ${val}\r\n`
         }
         return headersStr;
     };
