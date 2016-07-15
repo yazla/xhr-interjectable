@@ -2,8 +2,8 @@ interface XhrInterjectableConfig {
     realXhrConstructor : Function
     requestToKeyFn : (url : string, method: string, data : any) => string
     storage : {
-        save : (key : string, data : any) => void,
-        load : (key : string) => any
+        save : (key : string, data : {status, response, headers}) => void,
+        load : (key : string) => {status, response, headers}
     }
 }
 

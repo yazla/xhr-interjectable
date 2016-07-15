@@ -25,7 +25,26 @@
                 load : function(key)
                 {
                     return {
-                        'http://google.com/' : '<h1>This is be g00gle</h1>'
+                        'http://google.com/' : {status : 200, response : '<h1>This is be g00gle</h1>'},
+                        'https://www.google.com.ua' : {
+                                headers : {
+                                    'Content-Type' : 'application/json',
+                                    'X-Rate-Limit-Limit': 1000,
+                                    'Server': 'nginx',
+                                    'X-Request-ID': '4feea86f-22fc-4ae5-86c7-389379b9047f',
+                                    'X-Rate-Limit-Remaining': 0,
+                                    'Cache-Control': 'private, must-revalidate',
+                                    'Connection': 'keep-alive',
+                                    'Content-Length': 38,
+                                    'Retry-After': 2892,
+                                    'expires': -1
+
+                                },
+                                status : 429,
+                                response : {
+                                    "message": "API rate limit exceeded."
+                                }
+                            }
                     }[key]
                 }
             }
@@ -39,11 +58,19 @@
             console.log('ERROR', arguments);
         });
 
+        $.get('https://www.google.com.ua', function(data, textStatus, jqXHR) {
+            console.log('loaded', data);
+        }).fail(function() {
+            console.log('ERROR', arguments);
+        });
+
         $.get('http://www.html5rocks.com/en/', function(data, textStatus, jqXHR) {
             console.log('html5rocks loaded', data.substring(0,5));
         }).fail(function() {
             console.log('ERROR', arguments);
         });
+
+
 
         // ---------
 

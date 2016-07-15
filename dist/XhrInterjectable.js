@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+require=(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({"xhr-interjectable":[function(require,module,exports){
 'use strict';
 
 module.exports = function (_ref) {
@@ -12,7 +12,7 @@ module.exports = function (_ref) {
         var xhrWrapper = {
             set onreadystatechange(value) {
                 xhrWrapper._onreadystatechange = value;
-                xhrWrapper.response && xhrWrapper._onreadystatechange();
+                value && xhrWrapper.response && xhrWrapper._onreadystatechange();
             },
             get onreadystatechange() {
                 return xhrWrapper._onreadystatechange;
@@ -26,24 +26,32 @@ module.exports = function (_ref) {
             }
         };
 
-        function onSuccessfullResponseRecieved(response) {
+        function onSuccessfullResponseRecieved(_ref2) {
+            var status = _ref2.status;
+            var response = _ref2.response;
+            var headers = _ref2.headers;
+
             xhrWrapper.readyState = 4;
-            xhrWrapper.status = 200;
+            xhrWrapper.status = status;
             xhrWrapper.response = xhrWrapper.responseText = response;
+            xhrWrapper.responseHeaders = headers;
             xhrWrapper._onreadystatechange && xhrWrapper._onreadystatechange();
             xhrWrapper.onload && xhrWrapper.onload.apply(xhrWrapper);
         }
 
         function responseListener() {
             if (myXHR.readyState == 4 && myXHR.status == 200) {
-                var key = requestToKeyFn(xhrWrapper.__url, xhrWrapper.method, post_data);
-                storage.save(key, {
+                var key = requestToKeyFn(xhrWrapper.__url, xhrWrapper.method, xhrWrapper.__post_data);
+                var saveObj = {
                     url: xhrWrapper.__url,
                     post: xhrWrapper.__post_data,
-                    response: myXHR.response
-                });
+                    response: myXHR.response,
+                    headers: toJson(myXHR.getAllResponseHeaders()),
+                    status: myXHR.status
+                };
+                storage.save(key, saveObj);
 
-                onSuccessfullResponseRecieved(myXHR.response);
+                onSuccessfullResponseRecieved(saveObj);
             }
         };
 
@@ -74,10 +82,10 @@ module.exports = function (_ref) {
         };
 
         xhrWrapper.getResponseHeader = function (DOMStringheader) {
-            myXHR.getResponseHeader(DOMStringheader);
+            return this.responseHeaders && this.responseHeaders[DOMStringheader];
         };
         xhrWrapper.getAllResponseHeaders = function () {
-            myXHR.getAllResponseHeaders();
+            return this.responseHeaders;
         };
 
         xhrWrapper.abort = function () {
@@ -90,4 +98,14 @@ module.exports = function (_ref) {
     };
 };
 
-},{}]},{},[1]);
+function toJson() {
+    var text = arguments.length <= 0 || arguments[0] === undefined ? '' : arguments[0];
+
+    return text.split('\r\n').reduce(function (prev, current) {
+        var parts = current.split(':');
+        prev[parts[0]] = parts[1];
+        return prev;
+    }, {});
+};
+
+},{}]},{},[]);

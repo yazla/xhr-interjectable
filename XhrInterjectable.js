@@ -22,10 +22,11 @@ module.exports = ({
         }
     };
 
-    function onSuccessfullResponseRecieved (response) {
+    function onSuccessfullResponseRecieved ({status, response, headers, }) {
         xhrWrapper.readyState = 4;
-        xhrWrapper.status = 200;
+        xhrWrapper.status = status;
         xhrWrapper.response = xhrWrapper.responseText = response;
+        xhrWrapper.responseHeaders = headers;
         xhrWrapper._onreadystatechange && xhrWrapper._onreadystatechange();
         xhrWrapper.onload && xhrWrapper.onload.apply(xhrWrapper)
     }
@@ -33,16 +34,19 @@ module.exports = ({
     function responseListener (){
         if (myXHR.readyState == 4 && myXHR.status == 200){
             var key = requestToKeyFn(xhrWrapper.__url, xhrWrapper.method, xhrWrapper.__post_data);
-            storage.save(
-                key,
-                {
+            var saveObj = {
                     url : xhrWrapper.__url,
                     post : xhrWrapper.__post_data,
-                    response : myXHR.response
-                }
+                    response : myXHR.response,
+                    headers : toJson(myXHR.getAllResponseHeaders()),
+                    status : myXHR.status
+                };
+            storage.save(
+                key,
+                saveObj
             );
 
-            onSuccessfullResponseRecieved(myXHR.response);
+            onSuccessfullResponseRecieved(saveObj);
         }
     };
 
@@ -73,10 +77,10 @@ module.exports = ({
     };
 
     xhrWrapper.getResponseHeader = function (DOMStringheader){
-        return myXHR.getResponseHeader(DOMStringheader);
+        return this.responseHeaders && this.responseHeaders[DOMStringheader];
     };
     xhrWrapper.getAllResponseHeaders = function (){
-        return myXHR.getAllResponseHeaders();
+        return this.responseHeaders;
     };
 
     xhrWrapper.abort = function(){
@@ -86,4 +90,17 @@ module.exports = ({
     xhrWrapper.withCredentials = false;
 
     return xhrWrapper;
+};
+
+
+function toJson(text='')
+{
+    return text.split('\r\n').reduce(
+        function (prev, current){
+            var parts = current.split(':');
+            prev[parts[0]] = parts[1];
+            return prev;
+        },
+        {}
+    )
 };
