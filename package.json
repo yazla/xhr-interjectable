@@ -1,6 +1,6 @@
 {
   "name": "xhr-interjectable",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Interjectable xhr for caching and mocking",
   "main": "XhrInterjectable.js",
   "typings" : "XhrInterjectable.d.ts",

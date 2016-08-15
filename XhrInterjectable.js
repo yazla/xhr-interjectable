@@ -26,7 +26,7 @@ module.exports = ({
         xhrWrapper.readyState = 4;
         xhrWrapper.status = status;
         xhrWrapper.response = response;
-        xhrWrapper.responseText = JSON.stringify(response);
+        xhrWrapper.responseText = typeof(response) == 'string' ? response : JSON.stringify(response);
         xhrWrapper.responseHeaders = headers;
         xhrWrapper._onreadystatechange && xhrWrapper._onreadystatechange();
         xhrWrapper.onload && xhrWrapper.onload.apply(xhrWrapper)
